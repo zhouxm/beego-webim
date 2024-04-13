@@ -10,11 +10,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type Subscription struct {
-	Archive []models.Event      // All the events from the archive.
-	New     <-chan models.Event // New events coming in.
-}
-
 func newEvent(ep models.EventType, user, msg string) models.Event {
 	return models.Event{Type: ep, User: user, Timestamp: int(time.Now().Unix()), Content: msg}
 }
@@ -38,9 +33,7 @@ var (
 	// Channel for exit users.
 	unsubscribe = make(chan string, 10)
 	// Send events here to publish them.
-	publish = make(chan models.Event, 10)
-	// Long polling waiting list.
-	waitingList = list.New()
+	publish     = make(chan models.Event, 10)
 	subscribers = list.New()
 )
 
@@ -58,14 +51,7 @@ func chatroom() {
 				logs.Info("Old user:", sub.Name, ";WebSocket:", sub.Conn != nil)
 			}
 		case event := <-publish:
-			// Notify waiting list.
-			for ch := waitingList.Back(); ch != nil; ch = ch.Prev() {
-				ch.Value.(chan bool) <- true
-				waitingList.Remove(ch)
-			}
-
 			broadcastWebSocket(event)
-			models.NewArchive(event)
 
 			if event.Type == models.EVENT_MESSAGE {
 				logs.Info("Message from", event.User, ";Content:", event.Content)
