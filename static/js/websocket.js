@@ -2,7 +2,11 @@ var socket;
 
 $(document).ready(function () {
     // Create a socket
-    socket = new WebSocket('ws://' + window.location.host + '/ws/play?uname=' + $('#uname').text());
+    var wsScheme = "ws://";
+    if (window.location.protocol === "https:") {
+        wsScheme = "wss://"
+    }
+    socket = new WebSocket(wsScheme + window.location.host + '/ws/join?uname=' + $('#uname').text());
     // Message received on the socket
     socket.onmessage = function (event) {
         var data = JSON.parse(event.data);
@@ -12,7 +16,7 @@ $(document).ready(function () {
 
         switch (data.Type) {
         case 0: // JOIN
-            if (data.User == $('#uname').text()) {
+            if (data.User === $('#uname').text()) {
                 li.innerText = 'You joined the chat room.';
             } else {
                 li.innerText = data.User + ' joined the chat room.';

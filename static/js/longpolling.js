@@ -5,13 +5,13 @@ var fetch = function () {
     if (isWait) return;
     isWait = true;
     $.getJSON("/lp/fetch?lastReceived=" + lastReceived, function (data) {
-        if (data == null) return;
+        if (data === null) return;
         $.each(data, function (i, event) {
             var li = document.createElement('li');
 
             switch (event.Type) {
             case 0: // JOIN
-                if (event.User == $('#uname').text()) {
+                if (event.User === $('#uname').text()) {
                     li.innerText = 'You joined the chat room.';
                 } else {
                     li.innerText = event.User + ' joined the chat room.';

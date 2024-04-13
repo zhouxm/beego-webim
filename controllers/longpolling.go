@@ -2,13 +2,11 @@ package controllers
 
 import (
 	"chat/models"
-
-	"github.com/beego/beego/v2/server/web"
 )
 
 // LongPollingController handles long polling requests.
 type LongPollingController struct {
-	web.Controller
+	baseController
 }
 
 // Join method handles GET requests for LongPollingController.

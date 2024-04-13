@@ -45,7 +45,7 @@ func (c *WebSocketController) Get() {
 }
 
 // Play method handles WebSocket requests for WebSocketController.
-func (c *WebSocketController) Play() {
+func (c *WebSocketController) Join() {
 	uname := c.GetString("uname")
 	logs.Info("WebSocketController.Join() called uname: [%s]", uname)
 	if len(uname) == 0 {

@@ -20,6 +20,6 @@ func init() {
 
 	// WebSocket.
 	web.Router("/ws", &controllers.WebSocketController{})
-	web.Router("/ws/play", &controllers.WebSocketController{}, "get:Play")
+	web.Router("/ws/join", &controllers.WebSocketController{}, "get:Join")
 
 }
