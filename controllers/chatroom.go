@@ -4,7 +4,7 @@ import (
 	"container/list"
 	"time"
 
-	"WebIM/models"
+	"chat/models"
 
 	"github.com/beego/beego/v2/core/logs"
 	"github.com/gorilla/websocket"
@@ -16,7 +16,7 @@ type Subscription struct {
 }
 
 func newEvent(ep models.EventType, user, msg string) models.Event {
-	return models.Event{ep, user, int(time.Now().Unix()), msg}
+	return models.Event{Type: ep, User: user, Timestamp: int(time.Now().Unix()), Content: msg}
 }
 
 func Join(user string, ws *websocket.Conn) {

@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"WebIM/controllers"
+	"chat/controllers"
 
 	"github.com/beego/beego/v2/server/web"
 )

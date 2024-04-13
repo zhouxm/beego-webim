@@ -6,10 +6,23 @@ import (
 
 	"github.com/beego/beego/v2/core/logs"
 
-	"WebIM/models"
+	"chat/models"
 
 	"github.com/gorilla/websocket"
 )
+
+var (
+	upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin:     checkOrigin,
+	}
+)
+
+// 验证跨域问题
+func checkOrigin(r *http.Request) bool {
+	return r.Header.Get("Origin") == "http://"+r.Host
+}
 
 // WebSocketController handles WebSocket requests.
 type WebSocketController struct {
@@ -17,33 +30,33 @@ type WebSocketController struct {
 }
 
 // Get method handles GET requests for WebSocketController.
-func (this *WebSocketController) Get() {
+func (c *WebSocketController) Get() {
 	// Safe check.
-	uname := this.GetString("uname")
+	uname := c.GetString("uname")
 	logs.Info("WebSocketController.Get() called uname: %s", uname)
 	if len(uname) == 0 {
-		this.Redirect("/", 302)
+		c.Redirect("/", 302)
 		return
 	}
 
-	this.TplName = "websocket.html"
-	this.Data["IsWebSocket"] = true
-	this.Data["UserName"] = uname
+	c.TplName = "websocket.html"
+	c.Data["IsWebSocket"] = true
+	c.Data["UserName"] = uname
 }
 
 // Play method handles WebSocket requests for WebSocketController.
-func (this *WebSocketController) Play() {
-	uname := this.GetString("uname")
+func (c *WebSocketController) Play() {
+	uname := c.GetString("uname")
 	logs.Info("WebSocketController.Join() called uname: [%s]", uname)
 	if len(uname) == 0 {
-		this.Redirect("/", 302)
+		c.Redirect("/", 302)
 		return
 	}
 
 	// Upgrade from http request to WebSocket.
-	ws, err := websocket.Upgrade(this.Ctx.ResponseWriter, this.Ctx.Request, nil, 1024, 1024)
+	ws, err := upgrader.Upgrade(c.Ctx.ResponseWriter, c.Ctx.Request, nil)
 	if _, ok := err.(websocket.HandshakeError); ok {
-		http.Error(this.Ctx.ResponseWriter, "Not a websocket handshake", 400)
+		http.Error(c.Ctx.ResponseWriter, "Not a websocket handshake", 400)
 		return
 	} else if err != nil {
 		logs.Error("Cannot setup WebSocket connection:", err)

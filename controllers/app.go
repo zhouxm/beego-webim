@@ -35,26 +35,26 @@ type baseController struct {
 
 // Prepare implemented Prepare() method for baseController.
 // It's used for language option check and setting.
-func (this *baseController) Prepare() {
+func (c *baseController) Prepare() {
 	// Reset language option.
-	this.Lang = "" // This field is from i18n.Locale.
+	c.Lang = "" // This field is from i18n.Locale.
 
 	// 1. Get language information from 'Accept-Language'.
-	al := this.Ctx.Request.Header.Get("Accept-Language")
+	al := c.Ctx.Request.Header.Get("Accept-Language")
 	if len(al) > 4 {
 		al = al[:5] // Only compare first 5 letters.
 		if i18n.IsExist(al) {
-			this.Lang = al
+			c.Lang = al
 		}
 	}
 
 	// 2. Default language is English.
-	if len(this.Lang) == 0 {
-		this.Lang = "en-US"
+	if len(c.Lang) == 0 {
+		c.Lang = "en-US"
 	}
 
 	// Set template level language option.
-	this.Data["Lang"] = this.Lang
+	c.Data["Lang"] = c.Lang
 }
 
 // AppController handles the welcome screen that allows user to pick a technology and username.
@@ -63,29 +63,29 @@ type AppController struct {
 }
 
 // Get implemented Get() method for AppController.
-func (this *AppController) Get() {
-	this.TplName = "welcome.html"
+func (c *AppController) Get() {
+	c.TplName = "welcome.html"
 }
 
 // Join method handles POST requests for AppController.
-func (this *AppController) Join() {
+func (c *AppController) Join() {
 	// Get form value.
-	uname := this.GetString("uname")
-	tech := this.GetString("tech")
+	uname := c.GetString("uname")
+	tech := c.GetString("tech")
 
 	// Check valid.
 	if len(uname) == 0 {
-		this.Redirect("/", 302)
+		c.Redirect("/", 302)
 		return
 	}
 
 	switch tech {
 	case "longpolling":
-		this.Redirect("/lp?uname="+uname, 302)
+		c.Redirect("/lp?uname="+uname, 302)
 	case "websocket":
-		this.Redirect("/ws?uname="+uname, 302)
+		c.Redirect("/ws?uname="+uname, 302)
 	default:
-		this.Redirect("/", 302)
+		c.Redirect("/", 302)
 	}
 
 	// Usually put return after redirect.

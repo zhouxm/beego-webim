@@ -1,7 +1,8 @@
 package controllers
 
 import (
-	"WebIM/models"
+	"chat/models"
+
 	"github.com/beego/beego/v2/server/web"
 )
 
@@ -11,28 +12,28 @@ type LongPollingController struct {
 }
 
 // Join method handles GET requests for LongPollingController.
-func (this *LongPollingController) Join() {
+func (c *LongPollingController) Join() {
 	// Safe check.
-	uname := this.GetString("uname")
+	uname := c.GetString("uname")
 	if len(uname) == 0 {
-		this.Redirect("/", 302)
+		c.Redirect("/", 302)
 		return
 	}
 
 	// Join chat room.
 	Join(uname, nil)
 
-	this.TplName = "longpolling.html"
-	this.Data["IsLongPolling"] = true
-	this.Data["UserName"] = uname
+	c.TplName = "longpolling.html"
+	c.Data["IsLongPolling"] = true
+	c.Data["UserName"] = uname
 }
 
 // Post method handles receive messages requests for LongPollingController.
-func (this *LongPollingController) Post() {
-	this.TplName = "longpolling.html"
+func (c *LongPollingController) Post() {
+	c.TplName = "longpolling.html"
 
-	uname := this.GetString("uname")
-	content := this.GetString("content")
+	uname := c.GetString("uname")
+	content := c.GetString("content")
 	if len(uname) == 0 || len(content) == 0 {
 		return
 	}
@@ -41,16 +42,16 @@ func (this *LongPollingController) Post() {
 }
 
 // Fetch method handles fetch archives requests for LongPollingController.
-func (this *LongPollingController) Fetch() {
-	lastReceived, err := this.GetInt("lastReceived")
+func (c *LongPollingController) Fetch() {
+	lastReceived, err := c.GetInt("lastReceived")
 	if err != nil {
 		return
 	}
 
 	events := models.GetEvents(int(lastReceived))
 	if len(events) > 0 {
-		this.Data["json"] = events
-		this.ServeJSON()
+		c.Data["json"] = events
+		c.ServeJSON()
 		return
 	}
 
@@ -59,6 +60,6 @@ func (this *LongPollingController) Fetch() {
 	waitingList.PushBack(ch)
 	<-ch
 
-	this.Data["json"] = models.GetEvents(int(lastReceived))
-	this.ServeJSON()
+	c.Data["json"] = models.GetEvents(int(lastReceived))
+	c.ServeJSON()
 }
